@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, useAnimation } from "framer-motion";
 import Swal from "sweetalert2";
-import Particles from "react-particles";
-import { loadSnowPreset } from "tsparticles-preset-snow";
 
 import NameDialog from "./components/nameDialog";
 import Footer from "./components/footer";
 import CircleHomeImage from "./components/circleHomeImage";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FiMusic } from "react-icons/fi"; // Icon library, ensure you have react-icons installed
 
 const list_text = [
 	{
@@ -38,7 +39,6 @@ function App() {
 	const [text, setText] = useState([]);
 	const [userName, setUserName] = useState("");
 
-	const [showSnow, setShowSnow] = useState(false);
 	const [alertShown, setAlertShown] = useState(false);
 
 	const [isNext, setIsNext] = useState(0);
@@ -54,6 +54,8 @@ function App() {
 	const controlsImage = useAnimation();
 
 	const [clickCount, setClickCount] = useState(0);
+
+	const audioRef = useRef(null);
 
 	function createSnowfall() {
 		const snowContainer = document.createElement("div");
@@ -86,24 +88,45 @@ function App() {
 		}, 5000);
 	}
 
-	const showBirthdayAlert = async () => {
-		setAlertShown(true);
-		const result = await Swal.fire({
-			title: "🎉 Happy Birthday! 🎉",
-			text: "Are you ready for your surprise?",
-			icon: "success",
-			confirmButtonText: "Yes!",
-			allowOutsideClick: false,
-			background: "#fff",
-			backdrop: `rgba(0,0,0,0.4)`,
-		});
-
-		if (result.isConfirmed) {
-			createSnowfall();
-			setIsNext(3);
-			setIsImageNext(2);
+	const handlePlayMusic = () => {
+		if (audioRef.current) {
+			console.log("Volume before play:", audioRef.current.volume);
+			audioRef.current.volume = 1;
+			audioRef.current
+				.play()
+				.then(() => console.log("Audio is playing"))
+				.catch((error) => console.error("Error playing audio:", error));
 		}
+
+		createSnowfall();
 		setAlertShown(false);
+
+		createSnowfall();
+		setIsNext(3);
+		setIsImageNext(2);
+	};
+
+	// Handle cancel button
+	const handleCancel = () => {
+		if (audioRef.current) {
+			audioRef.current.pause();
+			audioRef.current.currentTime = 0;
+		}
+
+		createSnowfall();
+		setAlertShown(false);
+
+		createSnowfall();
+		setIsNext(3);
+		setIsImageNext(2);
+	};
+
+	// Handle music ended
+	const handleMusicEnded = () => {
+		if (audioRef.current) {
+			audioRef.current.currentTime = 0;
+			audioRef.current.play();
+		}
 	};
 
 	const handleBalloonClick = (e) => {
@@ -112,7 +135,7 @@ function App() {
 			const newCount = prevCount + 1;
 			if (newCount === 3) {
 				setTimeout(() => {
-					showBirthdayAlert();
+					setAlertShown(true);
 				}, 500);
 			}
 			return newCount;
@@ -216,159 +239,175 @@ function App() {
 
 	return (
 		<div className="flex flex-col items-center justify-start pt-20 h-screen w-full gap-5 relative overflow-hidden">
-			{showSnow && (
-				<Particles
-					id="snow"
-					init={particlesInit}
-					options={{
-						preset: "snow",
-						particles: {
-							number: {
-								value: 100,
-							},
-							move: {
-								enable: true,
-								speed: 3,
-							},
-						},
-					}}
-				/>
-			)}
+			<>
+				{/* COVER */}
+				<div className="absolute inset-0 bg-[url('/bg.jpeg')] bg-cover bg-center">
+					<div className="absolute inset-0 bg-black opacity-50 pointer-events-none"></div>
+				</div>
+				{/* END COVER */}
 
-			{!alertShown && (
-				<>
-					{/* COVER */}
-					<div className="absolute inset-0 bg-[url('/bg.jpeg')] bg-cover bg-center">
-						<div className="absolute inset-0 bg-black opacity-50 pointer-events-none"></div>
-					</div>
-					{/* END COVER */}
+				{/* HEADER */}
+				{isNameEntered && (
+					<span className="flex flex-col items-center justify-center gap-3 z-10">
+						{/* CIRCLE IMG */}
+						<CircleHomeImage
+							controlsImage={controlsImage}
+							isNext={isImageNext}
+							list_gambar={list_gambar}
+						/>
+						{/* END CIRCLE IMG */}
 
-					{/* HEADER */}
-					{isNameEntered && (
-						<span className="flex flex-col items-center justify-center gap-3 z-10">
-							{/* CIRCLE IMG */}
-							<CircleHomeImage
-								controlsImage={controlsImage}
-								isNext={isImageNext}
-								list_gambar={list_gambar}
-							/>
-							{/* END CIRCLE IMG */}
-
-							<motion.h1
-								className="font-semibold text-white text-2xl"
-								initial={{ opacity: 0, scale: 0 }}
-								animate={{ opacity: 1, scale: 1 }}
-								transition={{
-									duration: 0.5,
-									scale: { type: "spring", stiffness: 100, damping: 10 },
-								}}>
-								Hai, {userName} ✨✨
-							</motion.h1>
-						</span>
-					)}
-					{/* END HEADER */}
-
-					{/* BODY */}
-					{animatePrev && (
-						<motion.span
-							className="w-3/4 border p-2 rounded-tl-xl rounded-br-xl z-10"
-							initial={{ opacity: 0, y: 40 }}
-							animate={{ opacity: 1, y: 0 }}
+						<motion.h1
+							className="font-semibold text-white text-2xl"
+							initial={{ opacity: 0, scale: 0 }}
+							animate={{ opacity: 1, scale: 1 }}
 							transition={{
-								duration: 0.4,
+								duration: 0.5,
 								scale: { type: "spring", stiffness: 100, damping: 10 },
 							}}>
-							<div
-								className={`bg-black/30 px-5 ${
-									isNext == 0 ? "pt-7 pb-3" : "py-7"
-								} rounded-tl-xl rounded-br-xl flex flex-col text-center gap-3 text-white`}>
-								{list_text[isNext]?.textHead && (
-									<motion.h1
-										className="font-semibold"
-										initial={{ opacity: 0, scale: 0 }}
-										animate={{
-											opacity: 1,
-											scale: 1,
-											transition: {
-												duration: 0.5,
-												scale: { type: "spring", stiffness: 100, damping: 10 },
-											},
-										}}
-										key={isNext}>
-										{list_text[isNext]?.textHead}
-									</motion.h1>
-								)}
+							Hai, {userName} ✨✨
+						</motion.h1>
+					</span>
+				)}
+				{/* END HEADER */}
 
-								{text && text.length > 0 && (
-									<p className="font-semibold">
-										{text}
-										<span className="animate-blink">|</span>
-									</p>
-								)}
+				{/* BODY */}
+				{animatePrev && (
+					<motion.span
+						className="w-3/4 border p-2 rounded-tl-xl rounded-br-xl z-10"
+						initial={{ opacity: 0, y: 40 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{
+							duration: 0.4,
+							scale: { type: "spring", stiffness: 100, damping: 10 },
+						}}>
+						<div
+							className={`bg-black/30 px-5 ${
+								isNext == 0 ? "pt-7 pb-3" : "py-7"
+							} rounded-tl-xl rounded-br-xl flex flex-col text-center gap-3 text-white`}>
+							{list_text[isNext]?.textHead && (
+								<motion.h1
+									className="font-semibold"
+									initial={{ opacity: 0, scale: 0 }}
+									animate={{
+										opacity: 1,
+										scale: 1,
+										transition: {
+											duration: 0.5,
+											scale: { type: "spring", stiffness: 100, damping: 10 },
+										},
+									}}
+									key={isNext}>
+									{list_text[isNext]?.textHead}
+								</motion.h1>
+							)}
 
-								{isNext === 2 && (
-									<motion.div
-										className="flex justify-center gap-2"
-										initial={{ opacity: 0 }}
-										animate={{
-											opacity: 1,
-											transition: { duration: 0.5 },
-										}}
-										key={isNext}>
-										{[1, 2, 3].map((id) => (
-											<motion.div
-												key={id}
-												className="balloon"
-												onClick={handleBalloonClick} // Fungsi klik
-												initial={{ opacity: 0, scale: 0 }}
-												animate={{
-													opacity: 1,
-													scale: 1,
-													transition: {
-														delay: id * 0.2, // Memberikan jeda antar balon
-														duration: 0.5,
-														scale: { type: "spring", stiffness: 100, damping: 10 },
-													},
-												}}>
-												🎈
-											</motion.div>
-										))}
-									</motion.div>
-								)}
+							{text && text.length > 0 && (
+								<p className="font-semibold">
+									{text}
+									<span className="animate-blink">|</span>
+								</p>
+							)}
 
-								{showButton && isNext == 0 && (
-									<span className="w-full flex items-center justify-end gap-5 pe-1 font-thin">
-										<motion.button
-											onClick={handleNext}
+							{isNext === 2 && (
+								<motion.div
+									className="flex justify-center gap-2"
+									initial={{ opacity: 0 }}
+									animate={{
+										opacity: 1,
+										transition: { duration: 0.5 },
+									}}
+									key={isNext}>
+									{[1, 2, 3].map((id) => (
+										<motion.div
+											key={id}
+											className="balloon"
+											onClick={handleBalloonClick} // Fungsi klik
 											initial={{ opacity: 0, scale: 0 }}
-											animate={{ opacity: 1, scale: 1 }}
-											whileTap={{ scale: 0.5 }}
-											transition={{
-												duration: 0.4,
-												scale: { type: "spring", stiffness: 100, damping: 10 },
+											animate={{
+												opacity: 1,
+												scale: 1,
+												transition: {
+													delay: id * 0.2, // Memberikan jeda antar balon
+													duration: 0.5,
+													scale: { type: "spring", stiffness: 100, damping: 10 },
+												},
 											}}>
-											<small>Klik Sini!</small>
-										</motion.button>
-									</span>
-								)}
-							</div>
-						</motion.span>
-					)}
-					{/* END BODY */}
+											🎈
+										</motion.div>
+									))}
+								</motion.div>
+							)}
 
-					{/* DIALOG */}
-					<NameDialog
-						setUserName={setUserName}
-						userName={userName}
-						setIsNameEntered={setIsNameEntered}
-					/>
-					{/* DIALOG */}
+							{showButton && isNext == 0 && (
+								<span className="w-full flex items-center justify-end gap-5 pe-1 font-thin">
+									<motion.button
+										onClick={handleNext}
+										initial={{ opacity: 0, scale: 0 }}
+										animate={{ opacity: 1, scale: 1 }}
+										whileTap={{ scale: 0.5 }}
+										transition={{
+											duration: 0.4,
+											scale: { type: "spring", stiffness: 100, damping: 10 },
+										}}>
+										<small>Klik Sini!</small>
+									</motion.button>
+								</span>
+							)}
+						</div>
+					</motion.span>
+				)}
+				{/* END BODY */}
 
-					{/* FOOTER */}
-					<Footer />
-					{/* END FOOTER */}
-				</>
-			)}
+				{/* DIALOG */}
+				<NameDialog
+					setUserName={setUserName}
+					userName={userName}
+					setIsNameEntered={setIsNameEntered}
+				/>
+				{/* DIALOG */}
+
+				{/* MUSIK */}
+				<audio ref={audioRef} onEnded={handleMusicEnded}>
+					<source src="/blue.mp3" type="audio/mpeg" />
+					Your browser does not support the audio element.
+				</audio>
+				{/* END MUSIC */}
+
+				{/* MUSIK MODAL */}
+				<Dialog open={alertShown} onOpenChange={setAlertShown}>
+					<DialogContent className="sm:max-w-[425px]">
+						<DialogHeader>
+							<DialogTitle className="flex flex-col items-center">
+								<FiMusic size={60} className="text-blue-500" />
+								<small className="mt-2">Musik yung kai - blue (Official Audio)</small>
+							</DialogTitle>
+						</DialogHeader>
+
+						<div className="flex gap-1 items-center justify-center">
+							<motion.button
+								whileHover={{ scale: 1.1 }}
+								whileTap={{ scale: 0.9 }}
+								className="py-2 px-4 rounded-md bg-blue-950/80 text-white w-full"
+								onClick={handlePlayMusic}>
+								<small>Aktifin</small>
+							</motion.button>
+							<motion.button
+								whileHover={{ scale: 1.1 }}
+								whileTap={{ scale: 0.9 }}
+								className="border py-2 px-4 rounded-md bg-red-500/80 text-white w-full"
+								onClick={handleCancel}>
+								<small>Ga pake Musik</small>
+							</motion.button>
+						</div>
+					</DialogContent>
+				</Dialog>
+				{/* END MUSIK MODAL */}
+
+				{/* FOOTER */}
+				<Footer />
+				{/* END FOOTER */}
+			</>
 		</div>
 	);
 }

@@ -40,7 +40,9 @@ const NameDialog = ({ setUserName, userName, setIsNameEntered }) => {
 					<motion.button
 						whileHover={{ scale: 1.2 }}
 						whileTap={{ scale: 0.8 }}
-						className="border py-1 rounded-md bg-black/30 text-white hover:bg-white hover:text-black hover:border-black transition-colors w-full"
+						className={`border py-1 rounded-md bg-black/30 text-white hover:bg-white hover:text-black hover:border-black transition-colors w-full ${
+							userName !== "" ? "bg-blue-950/80" : ""
+						}`}
 						onClick={handleDialogClose}>
 						<small>Sudah Min !!</small>
 					</motion.button>
