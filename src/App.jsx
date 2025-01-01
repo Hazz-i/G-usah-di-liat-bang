@@ -270,7 +270,7 @@ function App() {
 		setModalWa(false);
 		const message = encodeURIComponent("Minn aku dapet kadonyaa, mana hadiahnya :D ?");
 
-		const whatsappUrl = `https://wa.me/6285800715580?text=${message}`;
+		const whatsappUrl = `https://wa.me/62895800715580?text=${message}`;
 		window.open(whatsappUrl, "_blank");
 
 		setTimeout(() => {
