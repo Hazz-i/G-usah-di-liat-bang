@@ -10,7 +10,7 @@ const NameDialog = ({ setUserName, userName, setIsNameEntered }) => {
 	// Dialog close
 	const handleDialogClose = () => {
 		if (!userName.trim()) {
-			setError("boong lu, masukin nama dulu");
+			setError("gagall");
 			return;
 		}
 
