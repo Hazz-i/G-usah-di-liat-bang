@@ -24,7 +24,7 @@ const list_text = [
 	},
 	{
 		textHead: "Happy Birthday, ",
-		text: "Cie yang nambah tuaa, hehe \nMoga panjang umur yaa, \nbiar bisa traktir atmin hehehe 👻 \n\nAda pesan dari atmin dibawah :D",
+		text: "Cie yang nambah tuaa, \nMoga panjang umur yaa, \nbiar bisa traktir atmin hehehe 👻 \n\nAda pesan dari atmin dibawah :D",
 	},
 	{
 		textHead: "Tebak yang Mana Hadiahnya 👻👻 !!",
@@ -513,7 +513,6 @@ function App() {
 									className="balloon"
 									onClick={(e) => {
 										e.target.classList.add("popped");
-										console.log(id);
 										setGiftNumber(id);
 										setGiftModal(true);
 									}}
