@@ -168,7 +168,7 @@ function App() {
 
 	useEffect(() => {
 		giftNumber === randomGift ? setTrueGift(true) : setTrueGift(false);
-	}, [giftNumber]);
+	}, [giftNumber, randomGift]);
 
 	// Animasi untuk teks
 	useEffect(() => {
@@ -290,8 +290,8 @@ function App() {
 	return (
 		<div
 			className={`flex flex-col items-center ${
-				isNext == 5 ? "justify-center " : "justify-start pt-20 "
-			}h-screen w-full gap-5 relative overflow-hidden`}>
+				isNext == 5 ? " justify-center " : " justify-start pt-20 "
+			} h-screen w-full gap-5 relative overflow-hidden`}>
 			<>
 				{/* COVER */}
 				<div className="absolute inset-0 bg-[url('/bg.jpeg')] bg-cover bg-center">
@@ -547,18 +547,18 @@ function App() {
 							<motion.img
 								src={"https://media.tenor.com/g8LwF4tAoAYAAAAi/bye-sticker-goodbye-sticker.gif"}
 								alt="kado"
-								className="w-full h-full rounded-lg object-cover"
+								className=" rounded-lg object-cover"
 							/>
 						</motion.div>
 
 						<motion.h1
-							className="text-center font-semibold "
+							className="text-center font-semibold text-sm"
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							transition={{ delay: 0.5 }}>
-							Terimakasih sudah mampir ke siniii
-							<small>
-								<br /> semoga harimu menyenangkan 🎉✨
+							makasi dah mo mampir ke siniii
+							<small className="font-thin">
+								<br /> papay {userName}, smoga suka yak!! 🎉✨
 							</small>
 						</motion.h1>
 					</motion.div>
@@ -687,7 +687,7 @@ function App() {
 					<DialogContent className="sm:max-w-[425px] flex items-center justify-center flex-col">
 						<DialogHeader>
 							<DialogTitle className="flex flex-col items-center">
-								<small className="mt-2">Minta kadonya ke Atminn!!1</small>
+								<small className="mt-2">Minta kadonya ke Atminn!!!</small>
 							</DialogTitle>
 						</DialogHeader>
 
