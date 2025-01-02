@@ -1,12 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { useState, useRef } from "react";
 import { FiMusic } from "react-icons/fi"; // Icon library, ensure you have react-icons installed
 
-const MusikModal = () => {
-	const [dialogOpen, setDialogOpen] = useState(true);
-	const audioRef = useRef(null);
-
+const MusikModal = ({ audioRef, dialogOpen, setDialogOpen }) => {
 	const handlePlayMusic = () => {
 		if (audioRef.current) {
 			console.log("Volume before play:", audioRef.current.volume);
